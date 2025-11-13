@@ -301,7 +301,7 @@ calculateBtn.addEventListener('click', () => {
     const solarJsDate = new Date(solarDateObj.getYear(), solarDateObj.getMonth() - 1, solarDateObj.getDay());
 
     const DAY = 24 * 60 * 60 * 1000;
-    const gestationDays = 266;
+    const gestationDays = 261;
     const transferDate = new Date(solarJsDate.getTime() - gestationDays * DAY);
     const retrievalDate = new Date(transferDate.getTime() - 5 * DAY);
     const stimStartDate = new Date(retrievalDate.getTime() - 12 * DAY);
@@ -314,7 +314,7 @@ calculateBtn.addEventListener('click', () => {
       <div>• Bắt đầu kích trứng: <strong>${formatDatePair(stimStartDate)}</strong></div>
       <div>• Chọc hút trứng: <strong>${formatDatePair(retrievalDate)}</strong></div>
       <div>• Chuyển phôi: <strong>${formatDatePair(transferDate)}</strong></div>
-      <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 266 ngày = 38 tuần) và thời gian trung bình của quy trình IVF.</div>
+      <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 261 ngày) và thời gian trung bình của quy trình IVF.</div>
     `;
   } catch (e) {
     let errorMessage = 'Có lỗi khi tính toán ngày. ';
