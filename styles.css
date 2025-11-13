@@ -230,7 +230,7 @@ button:focus {
 
 .calendar-day.today {
   border: 2px solid var(--accent);
-  background: white;
+  background: #ffe4cc;
 }
 
 .calendar-day.today.selected {

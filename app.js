@@ -184,8 +184,8 @@ function renderCalendar() {
 
         dayElement.innerHTML = `
           <div class="day-info">
-            <div class="day-number">${isCurrentLunarMonth ? lunarDate.getDay() : solarJsDate.getDate()}</div>
-            <div class="lunar-number">${solarJsDate.getDate()}/${solarJsDate.getMonth() + 1}</div>
+            <div class="day-number">${lunarDate.getDay()}</div>
+            <div class="lunar-number">${solarJsDate.getDate()}/${solarJsDate.getMonth() + 1} (Dương)</div>
           </div>
           ${holiday && isCurrentLunarMonth ? `<div class="holiday-name">${holiday}</div>` : ''}
         `;
