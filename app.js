@@ -227,7 +227,7 @@ function renderCalendar() {
         let mainNumber, secondaryNumber;
         if (solarMainMode) {
           mainNumber = solarJsDate.getDate();
-          secondaryNumber = `${lunarDate.getDay()} (Âm)`;
+          secondaryNumber = `${lunarDate.getDay()}/${lunarDate.getMonth()} (Âm)`;
         } else {
           mainNumber = lunarDate.getDay();
           secondaryNumber = `${solarJsDate.getDate()}/${solarJsDate.getMonth() + 1} (Dương)`;
