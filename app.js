@@ -1,0 +1,277 @@
+// Calendar state
+let currentYear = 2026;
+let currentMonth = 1;
+let selectedDate = null;
+
+// DOM elements
+const resultDiv = document.getElementById('result');
+const calculateBtn = document.getElementById('calculate');
+const calendarDays = document.getElementById('calendarDays');
+const calendarTitle = document.getElementById('calendarTitle');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+
+// Vietnamese holidays (lunar calendar dates)
+const vietnameseHolidays = {
+  '1-1': 'Tết Nguyên Đán',
+  '1-2': 'Tết Nguyên Đán',
+  '1-3': 'Tết Nguyên Đán',
+  '2-10': 'Lễ hội Hoa Ban',
+  '3-10': 'Giỗ tổ Hùng Vương',
+  '4-15': 'Lễ Phật Đản',
+  '5-5': 'Tết Đoan Ngọ',
+  '6-15': 'Lễ Trung Nguyên',
+  '7-15': 'Lễ Vu Lan',
+  '8-15': 'Tết Trung Thu',
+  '9-9': 'Tết Trùng Cửu',
+  '10-15': 'Tết Dợn',
+  '11-15': 'Tết Ông Công Ông Táo',
+  '12-23': 'Ông Táo chầu trời',
+  '12-30': 'Tất Niên'
+};
+
+// Solar holidays
+const solarHolidays = {
+  '1-1': 'Tết Dương lịch',
+  '4-30': 'Giải phóng miền Nam',
+  '5-1': 'Quốc tế Lao động',
+  '9-2': 'Quốc khánh'
+};
+
+// Helper: Get start of week (Monday)
+function startOfWeekMonday(date) {
+  const day = date.day();
+  const diff = date.date() - day + (day === 0 ? -6 : 1);
+  return date.date(diff).startOf('day');
+}
+
+// Helper: Get end of week (Sunday)
+function endOfWeekSunday(date) {
+  return startOfWeekMonday(date).add(6, 'day');
+}
+
+// Helper: Get Vietnamese holiday
+function getVietnameseHoliday(lunarDate) {
+  const lunarKey = `${lunarDate.getMonth()}-${lunarDate.getDay()}`;
+  if (vietnameseHolidays[lunarKey]) {
+    return vietnameseHolidays[lunarKey];
+  }
+  const solarDate = lunarDate.getSolar();
+  const solarKey = `${solarDate.getMonth()}-${solarDate.getDay()}`;
+  if (solarHolidays[solarKey]) {
+    return solarHolidays[solarKey];
+  }
+  return null;
+}
+
+// Helper: Find last day of lunar month
+function getLastLunarDay(year, month) {
+  let lastDay = Lunar.fromYmd(year, month, 1);
+  let dayCount = 1;
+  while (true) {
+    try {
+      lastDay = Lunar.fromYmd(year, month, dayCount + 1);
+      dayCount++;
+    } catch (e) {
+      break;
+    }
+  }
+  return lastDay;
+}
+
+// Helper: Format date pair (solar + lunar)
+function formatDatePair(solarDate) {
+  const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+  const dayOfWeek = daysOfWeek[solarDate.getDay()];
+  const day = solarDate.getDate();
+  const month = solarDate.getMonth() + 1;
+  const year = solarDate.getFullYear();
+  const solarStr = `${dayOfWeek}, ngày ${day} tháng ${month}, năm ${year}`;
+  
+  const lunarDate = Lunar.fromDate(solarDate);
+  const lunarStr = `${dayOfWeek}, ngày ${lunarDate.getDay()} tháng ${lunarDate.getMonth()}, năm ${lunarDate.getYear()} (Âm lịch)`;
+  
+  return `<strong style="color: #2d3748;">${solarStr}</strong><br><small style="color: #666; font-weight: normal;">${lunarStr}</small>`;
+}
+
+// Render calendar
+function renderCalendar() {
+  calendarDays.innerHTML = '';
+  calendarTitle.textContent = `Tháng ${currentMonth}, Năm ${currentYear} (Âm lịch)`;
+
+  try {
+    if (!window.dayjs) {
+      throw new Error('Calendar library (dayjs) not loaded');
+    }
+
+    const dayjs = window.dayjs;
+    const firstLunarDay = Lunar.fromYmd(currentYear, currentMonth, 1);
+    const firstSolarDate = firstLunarDay.getSolar();
+    const lastLunarDay = getLastLunarDay(currentYear, currentMonth);
+    const lastSolarDate = lastLunarDay.getSolar();
+
+    const startSolarJsDate = new Date(
+      firstSolarDate.getYear(),
+      firstSolarDate.getMonth() - 1,
+      firstSolarDate.getDay()
+    );
+    const endSolarJsDate = new Date(
+      lastSolarDate.getYear(),
+      lastSolarDate.getMonth() - 1,
+      lastSolarDate.getDay()
+    );
+
+    const startSolarDate = dayjs(startSolarJsDate);
+    const endSolarDate = dayjs(endSolarJsDate);
+    const calendarStart = startOfWeekMonday(startSolarDate);
+    const calendarEnd = endOfWeekSunday(endSolarDate);
+
+    // Generate calendar weeks
+    const calendarWeeks = [];
+    let currentWeekStart = calendarStart;
+
+    while (currentWeekStart.isBefore(calendarEnd) || currentWeekStart.isSame(calendarEnd, 'day')) {
+      const week = [];
+      for (let i = 0; i < 7; i++) {
+        const date = currentWeekStart.add(i, 'day');
+        week.push({
+          year: date.year(),
+          month: date.month(),
+          day: date.date()
+        });
+      }
+      calendarWeeks.push(week);
+      currentWeekStart = currentWeekStart.add(7, 'day');
+    }
+
+    // Render calendar days
+    calendarWeeks.forEach(week => {
+      week.forEach(dayData => {
+        const solarDate = new Date(dayData.year, dayData.month, dayData.day);
+        const lunarDate = Lunar.fromDate(solarDate);
+        const holiday = getVietnameseHoliday(lunarDate);
+        const isCurrentLunarMonth = lunarDate.getMonth() === currentMonth && lunarDate.getYear() === currentYear;
+
+        const dayElement = document.createElement('div');
+        
+        if (!isCurrentLunarMonth) {
+          dayElement.className = 'calendar-day other-month';
+        } else {
+          dayElement.className = 'calendar-day';
+          dayElement.dataset.year = currentYear;
+          dayElement.dataset.month = currentMonth;
+          dayElement.dataset.day = lunarDate.getDay();
+
+          if (selectedDate && selectedDate.year === currentYear &&
+              selectedDate.month === currentMonth &&
+              selectedDate.day === lunarDate.getDay()) {
+            dayElement.classList.add('selected');
+          }
+
+          if (holiday) {
+            dayElement.classList.add('holiday');
+          }
+
+          const today = new Date();
+          if (solarDate.getFullYear() === today.getFullYear() &&
+              solarDate.getMonth() === today.getMonth() &&
+              solarDate.getDate() === today.getDate()) {
+            dayElement.classList.add('today');
+          }
+        }
+
+        dayElement.innerHTML = `
+          <div class="day-info">
+            <div class="day-number">${isCurrentLunarMonth ? lunarDate.getDay() : solarDate.getDate()}</div>
+            <div class="lunar-number">${solarDate.getDate()}/${solarDate.getMonth() + 1}</div>
+          </div>
+          ${holiday && isCurrentLunarMonth ? `<div class="holiday-name">${holiday}</div>` : ''}
+        `;
+
+        if (isCurrentLunarMonth) {
+          dayElement.addEventListener('click', () => {
+            selectedDate = { year: currentYear, month: currentMonth, day: lunarDate.getDay() };
+            calculateBtn.disabled = false;
+            calculateBtn.style.opacity = '1';
+            calculateBtn.style.cursor = 'pointer';
+            resultDiv.innerHTML = '<div class="muted">Đã chọn ngày. Nhấn "Tính lịch IVF" để xem kết quả.</div>';
+            renderCalendar();
+          });
+        }
+
+        calendarDays.appendChild(dayElement);
+      });
+    });
+  } catch (e) {
+    console.error('Calendar error:', e);
+    calendarDays.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">Lỗi khi tải thư viện lịch. Vui lòng tải lại trang.</div>';
+  }
+}
+
+// Navigation
+prevMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 1) {
+    currentMonth = 12;
+    currentYear--;
+  } else {
+    currentMonth--;
+  }
+  renderCalendar();
+});
+
+nextMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 12) {
+    currentMonth = 1;
+    currentYear++;
+  } else {
+    currentMonth++;
+  }
+  renderCalendar();
+});
+
+// Calculate IVF schedule
+calculateBtn.addEventListener('click', () => {
+  if (!selectedDate) {
+    alert('Vui lòng chọn ngày từ lịch trước khi tính toán.');
+    return;
+  }
+
+  try {
+    const lunarDate = Lunar.fromYmd(selectedDate.year, selectedDate.month, selectedDate.day);
+    const solarDateObj = lunarDate.getSolar();
+    const solarJsDate = new Date(solarDateObj.getYear(), solarDateObj.getMonth() - 1, solarDateObj.getDay());
+
+    const DAY = 24 * 60 * 60 * 1000;
+    const gestationDays = 266;
+    const transferDate = new Date(solarJsDate.getTime() - gestationDays * DAY);
+    const retrievalDate = new Date(transferDate.getTime() - 5 * DAY);
+    const stimStartDate = new Date(retrievalDate.getTime() - 12 * DAY);
+
+    resultDiv.innerHTML = `
+      <div><strong>🎯 Ngày sinh dự kiến</strong><br>
+      <strong>${formatDatePair(solarJsDate)}</strong></div>
+      <div style="height:12px;"></div>
+      <div><strong>🧮 Lịch IVF ước tính</strong></div>
+      <div>• Bắt đầu kích trứng: <strong>${formatDatePair(stimStartDate)}</strong></div>
+      <div>• Chọc hút trứng: <strong>${formatDatePair(retrievalDate)}</strong></div>
+      <div>• Chuyển phôi: <strong>${formatDatePair(transferDate)}</strong></div>
+      <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 266 ngày = 38 tuần) và thời gian trung bình của quy trình IVF.</div>
+    `;
+  } catch (e) {
+    let errorMessage = 'Có lỗi khi tính toán ngày. ';
+    if (e.message.includes('wrong')) {
+      errorMessage += 'Ngày âm lịch không hợp lệ. Vui lòng chọn ngày khác.';
+    } else {
+      errorMessage += 'Vui lòng thử lại hoặc chọn ngày khác.';
+    }
+    alert(errorMessage);
+    console.error('Date calculation error:', e);
+  }
+});
+
+// Initialize
+calculateBtn.disabled = true;
+calculateBtn.style.opacity = '0.5';
+calculateBtn.style.cursor = 'not-allowed';
+renderCalendar();
+
