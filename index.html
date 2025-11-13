@@ -361,12 +361,14 @@
     <p class="sub">Chọn ngày sinh dự kiến (Âm lịch) và nhấn nút để xem lịch IVF với thai kỳ 38 tuần từ ngày chuyển phôi.</p>
 
     <div class="info-section">
-      <h4>💡 Ví dụ cách tính IVF</h4>
-      <p><strong>Muốn sinh ngày 1/3/2027?</strong></p>
-      <p>• Ngày chuyển phôi: <strong>8/8/2026</strong> (266 ngày trước ngày sinh)</p>
-      <p>• Ngày chọc trứng: <strong>3/8/2026</strong> (5 ngày trước chuyển phôi)</p>
-      <p>• Bắt đầu kích trứng: <strong>22/7/2026</strong> (12 ngày trước chọc trứng)</p>
-      <p><em>Thai kỳ IVF thường 38 tuần từ ngày chuyển phôi.</em></p>
+      <h4>💡 Cách tính lịch IVF</h4>
+      <p><strong>Công thức tính ngược từ ngày sinh mong muốn:</strong></p>
+      <p>• <strong>Ngày chuyển phôi</strong> = Ngày sinh - 266 ngày (38 tuần thai kỳ IVF)</p>
+      <p>• <strong>Ngày chọc trứng</strong> = Ngày chuyển phôi - 5 ngày</p>
+      <p>• <strong>Bắt đầu kích trứng</strong> = Ngày chọc trứng - 12 ngày</p>
+      <p><strong>Ví dụ: Muốn sinh 1/3/2027</strong></p>
+      <p>• Chuyển phôi: 8/8/2026 • Chọc trứng: 3/8/2026 • Kích trứng: 22/7/2026</p>
+      <p><em>Thời gian có thể điều chỉnh theo phác đồ bác sĩ.</em></p>
     </div>
 
     <div class="calendar-container">
@@ -511,9 +513,10 @@
 
       // Add days of the month
       for (let day = 1; day <= totalDays; day++) {
-        const lunarDate = Lunar.fromYmd(currentYear, currentMonth, day);
-        const solarDate = lunarDate.getSolar();
-        const holiday = getVietnameseHoliday(lunarDate);
+        try {
+          const lunarDate = Lunar.fromYmd(currentYear, currentMonth, day);
+          const solarDate = lunarDate.getSolar();
+          const holiday = getVietnameseHoliday(lunarDate);
 
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
@@ -549,18 +552,23 @@
           ${holiday ? `<div class="holiday-name">${holiday}</div>` : ''}
         `;
 
-        dayElement.addEventListener('click', () => {
-          selectedDate = { year: currentYear, month: currentMonth, day: day };
-          // Enable calculate button
-          calculateBtn.disabled = false;
-          calculateBtn.style.opacity = '1';
-          calculateBtn.style.cursor = 'pointer';
-          // Clear previous results
-          resultDiv.innerHTML = '<div class="muted">Đã chọn ngày. Nhấn "Tính lịch IVF" để xem kết quả.</div>';
-          renderCalendar();
-        });
+          dayElement.addEventListener('click', () => {
+            selectedDate = { year: currentYear, month: currentMonth, day: day };
+            // Enable calculate button
+            calculateBtn.disabled = false;
+            calculateBtn.style.opacity = '1';
+            calculateBtn.style.cursor = 'pointer';
+            // Clear previous results
+            resultDiv.innerHTML = '<div class="muted">Đã chọn ngày. Nhấn "Tính lịch IVF" để xem kết quả.</div>';
+            renderCalendar();
+          });
 
-        calendarDays.appendChild(dayElement);
+          calendarDays.appendChild(dayElement);
+        } catch (e) {
+          console.warn(`Skipping invalid lunar date: ${currentYear}-${currentMonth}-${day}`, e);
+          // Skip this day if it's invalid
+          continue;
+        }
       }
 
       // Add next month days to fill the calendar grid
@@ -617,6 +625,19 @@
       return `${dayOfWeek}, ngày ${day} tháng ${month}, năm ${year}`;
     }
 
+    function fmtLunar(solarDate) {
+      // Create lunar date from solar date
+      const lunarDate = Lunar.fromDate(solarDate);
+      const dayOfWeek = daysOfWeek[solarDate.getDay()];
+      return `${dayOfWeek}, ngày ${lunarDate.getDay()} tháng ${lunarDate.getMonth()}, năm ${lunarDate.getYear()} (Âm lịch)`;
+    }
+
+    function formatDatePair(solarDate) {
+      const lunarStr = fmtLunar(solarDate);
+      const solarStr = fmt(solarDate);
+      return `<strong style="color: #2d3748;">${lunarStr}</strong><br><small style="color: #666; font-weight: normal;">${solarStr} (Dương lịch)</small>`;
+    }
+
     document.getElementById('calculate').addEventListener('click', () => {
       if (!selectedDate) {
         alert('Vui lòng chọn ngày từ lịch trước khi tính toán.');
@@ -628,9 +649,8 @@
       const ld = selectedDate.day;
 
       try {
-        // Use the lunar-javascript library classes directly
-        const solarDate = Solar.fromYmd(ly, lm, ld);
-        const lunarDate = solarDate.getLunar();
+        // Create lunar date object first, then get solar date
+        const lunarDate = Lunar.fromYmd(ly, lm, ld);
         const solarDateObj = lunarDate.getSolar();
         const solarJsDate = new Date(solarDateObj.getYear(), solarDateObj.getMonth()-1, solarDateObj.getDay());
 
@@ -643,17 +663,24 @@
 
         resultDiv.innerHTML = `
           <div><strong>🎯 Ngày sinh dự kiến</strong><br>
-          <strong>${fmt(solarJsDate)}</strong></div>
-          <div style="height:8px;"></div>
+          <strong>${formatDatePair(solarJsDate)}</strong></div>
+          <div style="height:12px;"></div>
           <div><strong>🧮 Lịch IVF ước tính</strong></div>
-          <div>• Bắt đầu kích trứng: <strong>${fmt(stimStartDate)}</strong></div>
-          <div>• Chọc hút trứng: <strong>${fmt(retrievalDate)}</strong></div>
-          <div>• Chuyển phôi: <strong>${fmt(transferDate)}</strong></div>
+          <div>• Bắt đầu kích trứng: <strong>${formatDatePair(stimStartDate)}</strong></div>
+          <div>• Chọc hút trứng: <strong>${formatDatePair(retrievalDate)}</strong></div>
+          <div>• Chuyển phôi: <strong>${formatDatePair(transferDate)}</strong></div>
           <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 266 ngày = 38 tuần) và thời gian trung bình của quy trình IVF.</div>
         `;
       } catch (e) {
-        alert('Lỗi chuyển đổi âm lịch → dương lịch. Vui lòng kiểm tra ngày bạn chọn.');
-        console.error(e);
+        let errorMessage = 'Có lỗi khi tính toán ngày. ';
+        if (e.message.includes('wrong')) {
+          errorMessage += 'Ngày âm lịch không hợp lệ. Vui lòng chọn ngày khác.';
+        } else {
+          errorMessage += 'Vui lòng thử lại hoặc chọn ngày khác.';
+        }
+
+        alert(errorMessage);
+        console.error('Date calculation error:', e);
       }
     });
   </script>
