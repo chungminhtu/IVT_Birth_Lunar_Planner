@@ -1,5 +1,5 @@
 // Calendar state
-let currentYear = 2026;
+let currentYear = 2027;
 let currentMonth = 1;
 let selectedDate = null;
 let solarMainMode = false; // false = lunar main, true = solar main
