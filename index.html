@@ -571,6 +571,7 @@
             });
           }
           calendarWeeks.push(week);
+          // Move to next week (dayjs is immutable, so add returns a new object)
           currentWeekStart = currentWeekStart.add(7, 'day');
         }
 
@@ -622,7 +623,6 @@
                 <div class="day-number">${isCurrentLunarMonth ? lunarDate.getDay() : solarDate.getDate()}</div>
                 <div class="lunar-number">${solarDate.getDate()}/${solarDate.getMonth() + 1}</div>
               </div>
-              ${weekdayName ? `<div class="weekday-name">${weekdayName}</div>` : ''}
               ${holiday && isCurrentLunarMonth ? `<div class="holiday-name">${holiday}</div>` : ''}
             `;
 
