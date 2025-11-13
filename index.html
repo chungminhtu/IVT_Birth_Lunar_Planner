@@ -80,6 +80,36 @@
     }
     .muted { color: var(--muted); font-size: 14px; }
 
+    .info-section {
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border: 1px solid rgba(91, 123, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(91, 123, 255, 0.1);
+    }
+
+    .info-section h4 {
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .info-section p {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 8px 0;
+    }
+
+    .info-section p:last-child {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      margin: 0;
+    }
+
     /* Calendar Styles */
     .calendar-container {
       margin-bottom: 20px;
@@ -155,14 +185,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 12px 8px;
+      justify-content: flex-start;
+      padding: 8px 6px;
       cursor: pointer;
       border-radius: 12px;
       transition: all 0.3s ease;
       position: relative;
       font-size: 16px;
-      min-height: 60px;
+      min-height: 70px;
       background: #fafbfc;
       border: 1px solid rgba(91, 123, 255, 0.1);
     }
@@ -182,14 +212,14 @@
     }
 
     .calendar-day.holiday {
-      background: linear-gradient(135deg, #ffeaa7, #ffd666);
-      color: #d63031;
+      background: linear-gradient(135deg, #e39ac7, #d685b8);
+      color: #4a0e4e;
       font-weight: 700;
-      border: 1px solid #ffd666;
+      border: 1px solid #c77dff;
     }
 
     .calendar-day.holiday.selected {
-      background: linear-gradient(135deg, #fdcb6e, #ffa726);
+      background: linear-gradient(135deg, #c77dff, #a855f7);
       color: white;
     }
 
@@ -204,46 +234,81 @@
 
     .calendar-day.other-month {
       color: var(--muted);
-      opacity: 0.3;
-      background: transparent;
-      border: none;
+      opacity: 0.4;
+      background: rgba(91, 123, 255, 0.02);
+      border: 1px solid rgba(91, 123, 255, 0.05);
     }
 
     .calendar-day.other-month:hover {
-      background: transparent;
+      background: rgba(91, 123, 255, 0.03);
       transform: none;
       box-shadow: none;
+      opacity: 0.5;
+    }
+
+    .day-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 4px;
     }
 
     .day-number {
       font-weight: 700;
       font-size: 18px;
-      margin-bottom: 4px;
       line-height: 1;
+      color: #2d3748;
+      margin-bottom: 2px;
+    }
+
+    .calendar-day.holiday .day-number,
+    .calendar-day.selected .day-number {
+      color: white;
     }
 
     .lunar-number {
-      font-size: 12px;
-      opacity: 0.7;
+      font-size: 11px;
       font-weight: 500;
+      color: #718096;
+      opacity: 0.8;
+    }
+
+    .calendar-day.holiday .lunar-number,
+    .calendar-day.selected .lunar-number {
+      color: rgba(255, 255, 255, 0.9);
     }
 
     .holiday-name {
       position: absolute;
-      bottom: 4px;
+      bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 700;
       text-align: center;
-      max-width: 90%;
+      max-width: 85%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 3px 6px;
+      border-radius: 6px;
+      color: #4a0e4e;
+      border: 1px solid rgba(199, 125, 255, 0.3);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .calendar-day.holiday .holiday-name {
       background: rgba(255, 255, 255, 0.9);
-      padding: 2px 4px;
-      border-radius: 4px;
-      color: #d63031;
+      color: #4a0e4e;
+      border: 1px solid rgba(199, 125, 255, 0.4);
+    }
+
+    .calendar-day.selected .holiday-name {
+      background: rgba(255, 255, 255, 0.9);
+      color: #4a0e4e;
+      border: 1px solid rgba(199, 125, 255, 0.4);
     }
 
     .calendar-info {
@@ -276,8 +341,8 @@
     }
 
     .legend-color.holiday {
-      background: linear-gradient(135deg, #ffeaa7, #ffd666);
-      border: 1px solid #ffd666;
+      background: linear-gradient(135deg, #e39ac7, #d685b8);
+      border: 1px solid #c77dff;
     }
     .legend-color.selected {
       background: linear-gradient(135deg, var(--accent), #4a7bff);
@@ -286,36 +351,100 @@
       border: 2px solid var(--accent);
       background: white;
     }
+
+    /* Date Input Styles */
+    .date-input-container {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid rgba(91, 123, 255, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-group label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .date-selectors {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .date-selector {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e6ed;
+      border-radius: 8px;
+      font-size: 16px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .date-selector:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(91, 123, 255, 0.1);
+    }
+
+    .date-selector:hover {
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .date-selectors {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .date-selector {
+        width: 100%;
+      }
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.4/lunar.min.js"></script> 
 
 </head>
 <body>
   <div class="card" role="main" aria-labelledby="title">
-    <h1 id="title">🧬 Kế hoạch IVF – Chọn ngày sinh Âm lịch (Chuyển phôi 5 ngày)</h1>
-    <p class="sub">Chọn ngày sinh dự kiến (Âm lịch) và nhấn nút để xem lịch IVF với chuyển phôi 5 ngày.</p>
+    <h1 id="title">🧬 Kế hoạch IVF – Phôi Đông Lạnh (Frozen Embryo)</h1>
+    <p class="sub">Nhập ngày bắt đầu kích trứng (Âm lịch) và nhấn nút để xem lịch IVF với phôi đông lạnh.</p>
 
-    <div class="calendar-container">
-      <div class="calendar-header">
-        <button id="prevMonth" class="nav-btn">←</button>
-        <h3 id="calendarTitle">Tháng 3, Năm 2027 (Âm lịch)</h3>
-        <button id="nextMonth" class="nav-btn">→</button>
-      </div>
-      <div class="calendar-grid">
-        <div class="day-header">CN</div>
-        <div class="day-header">T2</div>
-        <div class="day-header">T3</div>
-        <div class="day-header">T4</div>
-        <div class="day-header">T5</div>
-        <div class="day-header">T6</div>
-        <div class="day-header">T7</div>
-        <div id="calendarDays" class="calendar-days"></div>
-      </div>
-      <div class="calendar-info">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-color holiday"></div> Ngày lễ</div>
-          <div class="legend-item"><div class="legend-color selected"></div> Đã chọn</div>
-          <div class="legend-item"><div class="legend-color today"></div> Hôm nay</div>
+    <div class="info-section">
+      <h4>💡 Tại sao IVF tính ngày khác với thai tự nhiên?</h4>
+      <p>Thai kỳ từ IVF thường <strong>dài 38 tuần</strong> từ ngày chuyển phôi (thay vì 40 tuần như thai tự nhiên).</p>
+      <p><strong>📅 Quy trình IVF với phôi đông lạnh:</strong><br>
+      • Bắt đầu uống thuốc kích trứng<br>
+      • Sau 10-14 ngày: Chọc hút trứng<br>
+      • Tạo phôi và đông lạnh để chuyển phôi sau<br>
+      • Thai kỳ bắt đầu từ ngày chuyển phôi</p>
+      <p>Công cụ này giúp bạn tính toán các ngày quan trọng trong hành trình IVF của mình.</p>
+      <p><em>Dựa trên kinh nghiệm thực tế của các cặp vợ chồng làm IVF</em></p>
+    </div>
+
+    <div class="date-input-container">
+      <div class="input-group">
+        <label for="stimulationDate">📅 Chọn ngày bắt đầu kích trứng (Âm lịch):</label>
+        <div class="date-selectors">
+          <select id="stimYear" class="date-selector">
+            <option value="">Năm</option>
+          </select>
+          <select id="stimMonth" class="date-selector">
+            <option value="">Tháng</option>
+          </select>
+          <select id="stimDay" class="date-selector">
+            <option value="">Ngày</option>
+          </select>
         </div>
       </div>
     </div>
@@ -329,156 +458,62 @@
 
   <script>
     const resultDiv = document.getElementById('result');
-    const calendarDays = document.getElementById('calendarDays');
-    const calendarTitle = document.getElementById('calendarTitle');
-    const prevMonthBtn = document.getElementById('prevMonth');
-    const nextMonthBtn = document.getElementById('nextMonth');
+    const stimYear = document.getElementById('stimYear');
+    const stimMonth = document.getElementById('stimMonth');
+    const stimDay = document.getElementById('stimDay');
 
-    // Calendar state
-    let currentYear = 2027;
-    let currentMonth = 3; // March (lunar month)
-    let selectedDate = { year: 2027, month: 3, day: 1 }; // Default: March 1, 2027 (lunar)
-
-    // Vietnamese holidays (lunar calendar dates)
-    const vietnameseHolidays = {
-      // Tet Nguyen Dan (Lunar New Year) - varies by year but typically Jan/Feb
-      '1-1': 'Tết Nguyên Đán',
-      '1-2': 'Tết Nguyên Đán',
-      '1-3': 'Tết Nguyên Đán',
-      // Other major holidays
-      '2-10': 'Lễ hội Hoa Ban',
-      '3-10': 'Giỗ tổ Hùng Vương',
-      '4-15': 'Lễ Phật Đản',
-      '5-5': 'Tết Đoan Ngọ',
-      '6-15': 'Lễ Trung Nguyên',
-      '7-15': 'Lễ Vu Lan',
-      '8-15': 'Tết Trung Thu',
-      '9-9': 'Tết Trùng Cửu',
-      '10-15': 'Tết Dợn',
-      '11-15': 'Tết Ông Công Ông Táo',
-      '12-23': 'Ông Táo chầu trời',
-      '12-30': 'Tất Niên'
-    };
-
-    // Special solar holidays
-    const solarHolidays = {
-      '1-1': 'Tết Dương lịch',
-      '4-30': 'Giải phóng miền Nam',
-      '5-1': 'Quốc tế Lao động',
-      '9-2': 'Quốc khánh'
-    };
-
-    function getVietnameseHoliday(lunarDate) {
-      // Check lunar holidays first
-      const lunarKey = `${lunarDate.getMonth()}-${lunarDate.getDay()}`;
-      if (vietnameseHolidays[lunarKey]) {
-        return vietnameseHolidays[lunarKey];
-      }
-
-      // Check solar holidays
-      const solarDate = lunarDate.getSolar();
-      const solarKey = `${solarDate.getMonth()}-${solarDate.getDay()}`;
-      if (solarHolidays[solarKey]) {
-        return solarHolidays[solarKey];
-      }
-
-      return null;
+    // Populate year dropdown (2024-2030)
+    for (let year = 2024; year <= 2030; year++) {
+      const option = document.createElement('option');
+      option.value = year;
+      option.textContent = year;
+      stimYear.appendChild(option);
     }
 
-    function renderCalendar() {
-      calendarDays.innerHTML = '';
-      calendarTitle.textContent = `Tháng ${currentMonth}, Năm ${currentYear} (Âm lịch)`;
+    // Populate month dropdown (1-12)
+    for (let month = 1; month <= 12; month++) {
+      const option = document.createElement('option');
+      option.value = month;
+      option.textContent = `Tháng ${month}`;
+      stimMonth.appendChild(option);
+    }
 
-      // Get the first day of the lunar month
-      const firstDay = Lunar.fromYmd(currentYear, currentMonth, 1);
-      const solarFirstDay = firstDay.getSolar();
+    // Update days when month/year changes
+    function updateDays() {
+      const year = parseInt(stimYear.value);
+      const month = parseInt(stimMonth.value);
 
-      // Get the last day of the lunar month
-      const nextMonth = currentMonth === 12 ? Lunar.fromYmd(currentYear + 1, 1, 1) : Lunar.fromYmd(currentYear, currentMonth + 1, 1);
-      const lastDay = Lunar.fromYmd(currentYear, currentMonth, nextMonth.getSolar().getJulianDay() - solarFirstDay.getJulianDay() - 1);
+      stimDay.innerHTML = '<option value="">Ngày</option>';
 
-      const totalDays = lastDay.getDay();
+      if (!year || !month) return;
 
-      // Get starting weekday (0 = Sunday, 1 = Monday, etc.)
-      const startWeekday = solarFirstDay.getWeek();
+      // Get the number of days in the lunar month
+      try {
+        const nextMonth = month === 12 ? Lunar.fromYmd(year + 1, 1, 1) : Lunar.fromYmd(year, month + 1, 1);
+        const firstDay = Lunar.fromYmd(year, month, 1);
+        const solarFirstDay = firstDay.getSolar();
+        const lastDay = Lunar.fromYmd(year, month, nextMonth.getSolar().getJulianDay() - solarFirstDay.getJulianDay() - 1);
+        const totalDays = lastDay.getDay();
 
-      // Add empty cells for days before the first day of the month
-      for (let i = 0; i < startWeekday; i++) {
-        const emptyDay = document.createElement('div');
-        emptyDay.className = 'calendar-day other-month';
-        calendarDays.appendChild(emptyDay);
-      }
-
-      // Add days of the month
-      for (let day = 1; day <= totalDays; day++) {
-        const lunarDate = Lunar.fromYmd(currentYear, currentMonth, day);
-        const solarDate = lunarDate.getSolar();
-        const holiday = getVietnameseHoliday(lunarDate);
-
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.dataset.year = currentYear;
-        dayElement.dataset.month = currentMonth;
-        dayElement.dataset.day = day;
-
-        // Check if this is the selected date
-        if (selectedDate.year === currentYear &&
-            selectedDate.month === currentMonth &&
-            selectedDate.day === day) {
-          dayElement.classList.add('selected');
+        for (let day = 1; day <= totalDays; day++) {
+          const option = document.createElement('option');
+          option.value = day;
+          option.textContent = day;
+          stimDay.appendChild(option);
         }
-
-        // Check if this is a holiday
-        if (holiday) {
-          dayElement.classList.add('holiday');
+      } catch (e) {
+        // If there's an error, assume 30 days max
+        for (let day = 1; day <= 30; day++) {
+          const option = document.createElement('option');
+          option.value = day;
+          option.textContent = day;
+          stimDay.appendChild(option);
         }
-
-        // Check if this is today
-        const today = new Date();
-        if (solarDate.getYear() === today.getFullYear() &&
-            solarDate.getMonth() === today.getMonth() + 1 &&
-            solarDate.getDay() === today.getDate()) {
-          dayElement.classList.add('today');
-        }
-
-        dayElement.innerHTML = `
-          <div class="day-number">${day}</div>
-          <div class="lunar-number">${solarDate.getDay()}/${solarDate.getMonth()}</div>
-          ${holiday ? `<div class="holiday-name">${holiday}</div>` : ''}
-        `;
-
-        dayElement.addEventListener('click', () => {
-          selectedDate = { year: currentYear, month: currentMonth, day: day };
-          renderCalendar();
-        });
-
-        calendarDays.appendChild(dayElement);
       }
     }
 
-    // Navigation buttons
-    prevMonthBtn.addEventListener('click', () => {
-      if (currentMonth === 1) {
-        currentMonth = 12;
-        currentYear--;
-      } else {
-        currentMonth--;
-      }
-      renderCalendar();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-      if (currentMonth === 12) {
-        currentMonth = 1;
-        currentYear++;
-      } else {
-        currentMonth++;
-      }
-      renderCalendar();
-    });
-
-    // Initial render
-    renderCalendar();
+    stimYear.addEventListener('change', updateDays);
+    stimMonth.addEventListener('change', updateDays);
 
     const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 
@@ -491,33 +526,36 @@
     }
 
     document.getElementById('calculate').addEventListener('click', () => {
-      const ly = parseInt(yearSel.value, 10);
-      const lm = parseInt(monthSel.value, 10);
-      const ld = parseInt(daySel.value, 10);
+      const ly = selectedDate.year;
+      const lm = selectedDate.month;
+      const ld = selectedDate.day;
 
       try {
         // Use the lunar-javascript library classes directly
         const solarDate = Solar.fromYmd(ly, lm, ld);
         const lunarDate = solarDate.getLunar();
         const solarDateObj = lunarDate.getSolar();
-        const solarJsDate = new Date(solarDateObj.getYear(), solarDateObj.getMonth()-1, solarDateObj.getDay());
+        const stimulationStart = new Date(solarDateObj.getYear(), solarDateObj.getMonth()-1, solarDateObj.getDay());
 
         const DAY = 24*60*60*1000;
-        const gestationDays = 261; // 5-day embryo transfer: due date = transfer date + 261 days
-        const transferDate = new Date(solarJsDate.getTime() - gestationDays * DAY);
-        const retrievalDate = new Date(transferDate.getTime() - 5 * DAY);
-        const stimStartDate = new Date(retrievalDate.getTime() - 12 * DAY);
+
+        // Frozen embryo IVF timeline:
+        // Stimulation start → Egg retrieval (+12 days) → Embryo creation/freezing → Transfer (later) → Birth (+266 days from transfer)
+        const retrievalDate = new Date(stimulationStart.getTime() + 12 * DAY); // Egg retrieval 12 days after stimulation start
+        const transferDate = new Date(retrievalDate.getTime() + 5 * DAY); // Frozen embryo transfer 5 days after retrieval (can be later)
+        const gestationDays = 266; // 38 weeks from transfer to birth
+        const dueDate = new Date(transferDate.getTime() + gestationDays * DAY);
 
 
         resultDiv.innerHTML = `
-          <div><strong>🎯 Ngày sinh dự kiến</strong><br>
-          <strong>${fmt(solarJsDate)}</strong></div>
-          <div style="height:8px;"></div>
-          <div><strong>🧮 Lịch IVF ước tính</strong></div>
-          <div>• Bắt đầu kích trứng: <strong>${fmt(stimStartDate)}</strong></div>
+          <div><strong>🧬 Lịch IVF với Phôi Đông Lạnh</strong></div>
+          <div>• Bắt đầu kích trứng: <strong>${fmt(stimulationStart)}</strong></div>
           <div>• Chọc hút trứng: <strong>${fmt(retrievalDate)}</strong></div>
-          <div>• Chuyển phôi: <strong>${fmt(transferDate)}</strong></div>
-          <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 261 ngày) và thời gian trung bình của quy trình IVF.</div>
+          <div>• Chuyển phôi đông lạnh: <strong>${fmt(transferDate)}</strong></div>
+          <div style="height:8px;"></div>
+          <div><strong>👶 Ngày sinh dự kiến</strong><br>
+          <strong>${fmt(dueDate)}</strong></div>
+          <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi đông lạnh 5 ngày (thai kỳ 266 ngày = 38 tuần) và thời gian trung bình của quy trình IVF.</div>
         `;
       } catch (e) {
         alert('Lỗi chuyển đổi âm lịch → dương lịch. Vui lòng kiểm tra ngày bạn chọn.');
