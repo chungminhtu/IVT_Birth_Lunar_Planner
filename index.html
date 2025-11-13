@@ -635,7 +635,7 @@
     function formatDatePair(solarDate) {
       const lunarStr = fmtLunar(solarDate);
       const solarStr = fmt(solarDate);
-      return `<strong style="color: #2d3748;">${lunarStr}</strong><br><small style="color: #666; font-weight: normal;">${solarStr} (Dương lịch)</small>`;
+      return `<strong style="color: #2d3748;">${solarStr}</strong><br><small style="color: #666; font-weight: normal;">${lunarStr.replace(' (Âm lịch)', '')} (Âm lịch)</small>`;
     }
 
     document.getElementById('calculate').addEventListener('click', () => {
