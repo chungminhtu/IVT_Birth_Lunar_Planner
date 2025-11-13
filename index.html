@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Kế hoạch IVF – Chọn ngày sinh Âm lịch</title>
+  <style>
+    :root {
+      --bg: #f7f8fc;
+      --card: #fff;
+      --accent: #5b7fff;
+      --text: #222;
+      --muted: #666;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: clamp(16px, 3vw, 32px);
+      box-shadow: 0 6px 28px rgba(15,20,40,0.08);
+      width: 100%;
+    }
+    h1 {
+      font-size: clamp(20px, 2vw, 28px);
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    p.sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: clamp(13px,1.2vw,16px);
+      margin-bottom: 20px;
+    }
+    .grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    select, button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d7dbe8;
+      font-size: 16px;
+    }
+    select:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(91,123,255,0.15);
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .25s;
+    }
+    .btn:hover { background: #3f66ff; }
+    .result {
+      background: #eef3ff;
+      padding: 16px;
+      border-radius: 10px;
+      margin-top: 18px;
+      line-height: 1.6;
+    }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    /* Calendar Styles */
+    .calendar-container {
+      margin-bottom: 20px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(91, 123, 255, 0.1);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .calendar-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .nav-btn {
+      background: linear-gradient(135deg, var(--accent), #4a7bff);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(91, 123, 255, 0.3);
+    }
+
+    .nav-btn:hover {
+      background: linear-gradient(135deg, #4a7bff, var(--accent));
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(91, 123, 255, 0.4);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .day-header {
+      text-align: center;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 12px 8px;
+      font-size: 14px;
+      background: rgba(91, 123, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .calendar-days {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      font-size: 16px;
+      min-height: 60px;
+      background: #fafbfc;
+      border: 1px solid rgba(91, 123, 255, 0.1);
+    }
+
+    .calendar-day:hover {
+      background: rgba(91, 123, 255, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(91, 123, 255, 0.15);
+    }
+
+    .calendar-day.selected {
+      background: linear-gradient(135deg, var(--accent), #4a7bff);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(91, 123, 255, 0.3);
+      border: none;
+    }
+
+    .calendar-day.holiday {
+      background: linear-gradient(135deg, #ffeaa7, #ffd666);
+      color: #d63031;
+      font-weight: 700;
+      border: 1px solid #ffd666;
+    }
+
+    .calendar-day.holiday.selected {
+      background: linear-gradient(135deg, #fdcb6e, #ffa726);
+      color: white;
+    }
+
+    .calendar-day.today {
+      border: 2px solid var(--accent);
+      background: white;
+    }
+
+    .calendar-day.today.selected {
+      border: 2px solid #fff;
+    }
+
+    .calendar-day.other-month {
+      color: var(--muted);
+      opacity: 0.3;
+      background: transparent;
+      border: none;
+    }
+
+    .calendar-day.other-month:hover {
+      background: transparent;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .day-number {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .lunar-number {
+      font-size: 12px;
+      opacity: 0.7;
+      font-weight: 500;
+    }
+
+    .holiday-name {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      text-align: center;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 4px;
+      border-radius: 4px;
+      color: #d63031;
+    }
+
+    .calendar-info {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(91, 123, 255, 0.2);
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .legend-color.holiday {
+      background: linear-gradient(135deg, #ffeaa7, #ffd666);
+      border: 1px solid #ffd666;
+    }
+    .legend-color.selected {
+      background: linear-gradient(135deg, var(--accent), #4a7bff);
+    }
+    .legend-color.today {
+      border: 2px solid var(--accent);
+      background: white;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.4/lunar.min.js"></script> 
+
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="title">
+    <h1 id="title">🧬 Kế hoạch IVF – Chọn ngày sinh Âm lịch (Chuyển phôi 5 ngày)</h1>
+    <p class="sub">Chọn ngày sinh dự kiến (Âm lịch) và nhấn nút để xem lịch IVF với chuyển phôi 5 ngày.</p>
+
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <button id="prevMonth" class="nav-btn">←</button>
+        <h3 id="calendarTitle">Tháng 3, Năm 2027 (Âm lịch)</h3>
+        <button id="nextMonth" class="nav-btn">→</button>
+      </div>
+      <div class="calendar-grid">
+        <div class="day-header">CN</div>
+        <div class="day-header">T2</div>
+        <div class="day-header">T3</div>
+        <div class="day-header">T4</div>
+        <div class="day-header">T5</div>
+        <div class="day-header">T6</div>
+        <div class="day-header">T7</div>
+        <div id="calendarDays" class="calendar-days"></div>
+      </div>
+      <div class="calendar-info">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-color holiday"></div> Ngày lễ</div>
+          <div class="legend-item"><div class="legend-color selected"></div> Đã chọn</div>
+          <div class="legend-item"><div class="legend-color today"></div> Hôm nay</div>
+        </div>
+      </div>
+    </div>
+
+    <button id="calculate" class="btn">Tính lịch IVF</button>
+
+    <div class="result" id="result">
+      <div class="muted">Vui lòng chọn ngày Âm lịch và nhấn “Tính lịch IVF”.</div>
+    </div>
+  </div>
+
+  <script>
+    const resultDiv = document.getElementById('result');
+    const calendarDays = document.getElementById('calendarDays');
+    const calendarTitle = document.getElementById('calendarTitle');
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+
+    // Calendar state
+    let currentYear = 2027;
+    let currentMonth = 3; // March (lunar month)
+    let selectedDate = { year: 2027, month: 3, day: 1 }; // Default: March 1, 2027 (lunar)
+
+    // Vietnamese holidays (lunar calendar dates)
+    const vietnameseHolidays = {
+      // Tet Nguyen Dan (Lunar New Year) - varies by year but typically Jan/Feb
+      '1-1': 'Tết Nguyên Đán',
+      '1-2': 'Tết Nguyên Đán',
+      '1-3': 'Tết Nguyên Đán',
+      // Other major holidays
+      '2-10': 'Lễ hội Hoa Ban',
+      '3-10': 'Giỗ tổ Hùng Vương',
+      '4-15': 'Lễ Phật Đản',
+      '5-5': 'Tết Đoan Ngọ',
+      '6-15': 'Lễ Trung Nguyên',
+      '7-15': 'Lễ Vu Lan',
+      '8-15': 'Tết Trung Thu',
+      '9-9': 'Tết Trùng Cửu',
+      '10-15': 'Tết Dợn',
+      '11-15': 'Tết Ông Công Ông Táo',
+      '12-23': 'Ông Táo chầu trời',
+      '12-30': 'Tất Niên'
+    };
+
+    // Special solar holidays
+    const solarHolidays = {
+      '1-1': 'Tết Dương lịch',
+      '4-30': 'Giải phóng miền Nam',
+      '5-1': 'Quốc tế Lao động',
+      '9-2': 'Quốc khánh'
+    };
+
+    function getVietnameseHoliday(lunarDate) {
+      // Check lunar holidays first
+      const lunarKey = `${lunarDate.getMonth()}-${lunarDate.getDay()}`;
+      if (vietnameseHolidays[lunarKey]) {
+        return vietnameseHolidays[lunarKey];
+      }
+
+      // Check solar holidays
+      const solarDate = lunarDate.getSolar();
+      const solarKey = `${solarDate.getMonth()}-${solarDate.getDay()}`;
+      if (solarHolidays[solarKey]) {
+        return solarHolidays[solarKey];
+      }
+
+      return null;
+    }
+
+    function renderCalendar() {
+      calendarDays.innerHTML = '';
+      calendarTitle.textContent = `Tháng ${currentMonth}, Năm ${currentYear} (Âm lịch)`;
+
+      // Get the first day of the lunar month
+      const firstDay = Lunar.fromYmd(currentYear, currentMonth, 1);
+      const solarFirstDay = firstDay.getSolar();
+
+      // Get the last day of the lunar month
+      const nextMonth = currentMonth === 12 ? Lunar.fromYmd(currentYear + 1, 1, 1) : Lunar.fromYmd(currentYear, currentMonth + 1, 1);
+      const lastDay = Lunar.fromYmd(currentYear, currentMonth, nextMonth.getSolar().getJulianDay() - solarFirstDay.getJulianDay() - 1);
+
+      const totalDays = lastDay.getDay();
+
+      // Get starting weekday (0 = Sunday, 1 = Monday, etc.)
+      const startWeekday = solarFirstDay.getWeek();
+
+      // Add empty cells for days before the first day of the month
+      for (let i = 0; i < startWeekday; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        calendarDays.appendChild(emptyDay);
+      }
+
+      // Add days of the month
+      for (let day = 1; day <= totalDays; day++) {
+        const lunarDate = Lunar.fromYmd(currentYear, currentMonth, day);
+        const solarDate = lunarDate.getSolar();
+        const holiday = getVietnameseHoliday(lunarDate);
+
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.dataset.year = currentYear;
+        dayElement.dataset.month = currentMonth;
+        dayElement.dataset.day = day;
+
+        // Check if this is the selected date
+        if (selectedDate.year === currentYear &&
+            selectedDate.month === currentMonth &&
+            selectedDate.day === day) {
+          dayElement.classList.add('selected');
+        }
+
+        // Check if this is a holiday
+        if (holiday) {
+          dayElement.classList.add('holiday');
+        }
+
+        // Check if this is today
+        const today = new Date();
+        if (solarDate.getYear() === today.getFullYear() &&
+            solarDate.getMonth() === today.getMonth() + 1 &&
+            solarDate.getDay() === today.getDate()) {
+          dayElement.classList.add('today');
+        }
+
+        dayElement.innerHTML = `
+          <div class="day-number">${day}</div>
+          <div class="lunar-number">${solarDate.getDay()}/${solarDate.getMonth()}</div>
+          ${holiday ? `<div class="holiday-name">${holiday}</div>` : ''}
+        `;
+
+        dayElement.addEventListener('click', () => {
+          selectedDate = { year: currentYear, month: currentMonth, day: day };
+          renderCalendar();
+        });
+
+        calendarDays.appendChild(dayElement);
+      }
+    }
+
+    // Navigation buttons
+    prevMonthBtn.addEventListener('click', () => {
+      if (currentMonth === 1) {
+        currentMonth = 12;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+      if (currentMonth === 12) {
+        currentMonth = 1;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      renderCalendar();
+    });
+
+    // Initial render
+    renderCalendar();
+
+    const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+
+    function fmt(date) {
+      const dayOfWeek = daysOfWeek[date.getDay()];
+      const day = date.getDate();
+      const month = date.getMonth() + 1; // getMonth() returns 0-11, we want 1-12
+      const year = date.getFullYear();
+      return `${dayOfWeek}, ngày ${day} tháng ${month}, năm ${year}`;
+    }
+
+    document.getElementById('calculate').addEventListener('click', () => {
+      const ly = parseInt(yearSel.value, 10);
+      const lm = parseInt(monthSel.value, 10);
+      const ld = parseInt(daySel.value, 10);
+
+      try {
+        // Use the lunar-javascript library classes directly
+        const solarDate = Solar.fromYmd(ly, lm, ld);
+        const lunarDate = solarDate.getLunar();
+        const solarDateObj = lunarDate.getSolar();
+        const solarJsDate = new Date(solarDateObj.getYear(), solarDateObj.getMonth()-1, solarDateObj.getDay());
+
+        const DAY = 24*60*60*1000;
+        const gestationDays = 261; // 5-day embryo transfer: due date = transfer date + 261 days
+        const transferDate = new Date(solarJsDate.getTime() - gestationDays * DAY);
+        const retrievalDate = new Date(transferDate.getTime() - 5 * DAY);
+        const stimStartDate = new Date(retrievalDate.getTime() - 12 * DAY);
+
+
+        resultDiv.innerHTML = `
+          <div><strong>🎯 Ngày sinh dự kiến</strong><br>
+          <strong>${fmt(solarJsDate)}</strong></div>
+          <div style="height:8px;"></div>
+          <div><strong>🧮 Lịch IVF ước tính</strong></div>
+          <div>• Bắt đầu kích trứng: <strong>${fmt(stimStartDate)}</strong></div>
+          <div>• Chọc hút trứng: <strong>${fmt(retrievalDate)}</strong></div>
+          <div>• Chuyển phôi: <strong>${fmt(transferDate)}</strong></div>
+          <div style="margin-top:8px;" class="muted">* Ước tính dựa trên chuyển phôi 5 ngày (thai kỳ 261 ngày) và thời gian trung bình của quy trình IVF.</div>
+        `;
+      } catch (e) {
+        alert('Lỗi chuyển đổi âm lịch → dương lịch. Vui lòng kiểm tra ngày bạn chọn.');
+        console.error(e);
+      }
+    });
+  </script>
+</body>
+</html>
