@@ -14,8 +14,10 @@ const solarMainCheckbox = document.getElementById('solarMainMode');
 
 // Initialize holidays for Vietnam using date-holidays library
 let holidaysHD;
-if (typeof Holidays !== 'undefined') {
-  holidaysHD = new Holidays('VN');
+if (typeof window !== 'undefined' && window.Holidays) {
+  // UMD build exports as window.Holidays.default
+  const HolidaysClass = window.Holidays.default || window.Holidays;
+  holidaysHD = new HolidaysClass('VN');
 } else {
   holidaysHD = null;
   console.warn('date-holidays library not loaded');
